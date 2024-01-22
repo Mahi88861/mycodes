@@ -1,0 +1,48 @@
+---
+- hosts: test
+  connection: ssh
+
+  tasks:
+    - name: installing java 
+      yum: name={{item}} state=present
+      with_items:
+        - java-1.8.0-openjdk 
+        - git 
+        - maven 
+
+    - name: installing tomcat
+      get_url:
+        url : "https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.85/bin/apache-tomcat-9.0.85.tar.gz"
+        dest: "/root"
+
+    - name: untar the file
+      command: tar -zxvf apache-tomcat-9.0.85.tar.gz
+
+    - name: copy the file
+      command: mv apache-tomcat-9.0.85  tomcat
+     
+
+    - name: copying the context file
+      copy:
+        src: "context.xml"
+        dest: tomcat/webapps/manager/META-INF/context.xml
+
+    - name: copying the user
+      copy:
+        src: "tomcat-users.xml"
+        dest: tomcat/conf/tomcat-users.xml
+
+    - name: start tomcat
+      shell: nohup ./tomcat/bin/startup.sh
+
+    - name:
+      copy:
+        src: "myweb-8.4.9.war"
+        dest: "/root/tomcat/webapps/myweb-8.4.9.war"
+      tags: abc  
+
+
+
+
+
+
